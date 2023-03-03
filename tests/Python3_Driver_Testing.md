@@ -23,10 +23,12 @@
 | <a name="BTECH_FRS-A1"></a> BTECH_FRS-A1 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.01% |
 | <a name="BTECH_FRS-B1"></a> BTECH_FRS-B1 | [@KC9HI](https://github.com/KC9HI) | 28-Nov-2022 | Yes | 0.04% |
 | <a name="BTECH_GMRS-20V2"></a> BTECH_GMRS-20V2 | [@KC9HI](https://github.com/KC9HI) | 13-Nov-2022 | Yes | 0.03% |
+| <a name="BTECH_GMRS-50V2"></a> BTECH_GMRS-50V2 | [@KC9HI](https://github.com/KC9HI) | 15-Feb-2023 | Yes | 0.00% |
 | <a name="BTECH_GMRS-50X1"></a> BTECH_GMRS-50X1 | [@KC9HI](https://github.com/KC9HI) | 13-Nov-2022 | Yes | 0.13% |
 | <a name="BTECH_GMRS-V1"></a> BTECH_GMRS-V1 | [@KC9HI](https://github.com/KC9HI) | 10-Dec-2022 | Yes | 0.16% |
 | <a name="BTECH_GMRS-V2"></a> BTECH_GMRS-V2 | [@KC9HI](https://github.com/KC9HI) | 10-Dec-2022 | Yes | 0.16% |
 | <a name="BTECH_MURS-V1"></a> BTECH_MURS-V1 | [@KC9HI](https://github.com/KC9HI) | 10-Dec-2022 | Yes | 0.04% |
+| <a name="BTECH_MURS-V2"></a> BTECH_MURS-V2 | [@KC9HI](https://github.com/KC9HI) | 2-Mar-2023 | Yes | 0.00% |
 | <a name="BTECH_UV-2501"></a> BTECH_UV-2501 | [@KC9HI](https://github.com/KC9HI) | 11-Nov-2022 | Yes | 0.02% |
 | <a name="BTECH_UV-2501+220"></a> BTECH_UV-2501+220 | [@KC9HI](https://github.com/KC9HI) | 11-Nov-2022 | Yes | 0.02% |
 | <a name="BTECH_UV-25X2"></a> BTECH_UV-25X2 | [@KC9HI](https://github.com/KC9HI) | 11-Nov-2022 | Yes | 0.15% |
@@ -56,7 +58,7 @@
 | <a name="Baofeng_UV-9G"></a> Baofeng_UV-9G | [@KC9HI](https://github.com/KC9HI) | 3-Dec-2022 | Yes | 0.65% |
 | <a name="Baofeng_UV-9R"></a> Baofeng_UV-9R | [@KC9HI](https://github.com/KC9HI) | 3-Dec-2022 | Yes | **2.52%** |
 | <a name="Baofeng_UV-B5"></a> Baofeng_UV-B5 | [@KC9HI](https://github.com/KC9HI) | 18-Nov-2022 | Yes | 0.35% |
-| <a name="Baojie_BJ-218"></a> Baojie_BJ-218 |  |  | Yes | 0.29% |
+| <a name="Baojie_BJ-218"></a> Baojie_BJ-218 | [Implied by LUITON_LT-725UV](#user-content-LUITON_LT-725UV) | 16-Feb-2023 | Yes | 0.29% |
 | <a name="Baojie_BJ-318"></a> Baojie_BJ-318 | [@KC9HI](https://github.com/KC9HI) | 2-Jan-2023 | Yes | 0.10% |
 | <a name="Baojie_BJ-9900"></a> Baojie_BJ-9900 |  |  |  | 0.02% |
 | <a name="Baojie_BJ-UV55"></a> Baojie_BJ-UV55 |  |  | Yes | 0.03% |
@@ -84,7 +86,7 @@
 | <a name="Icom_IC-2730A"></a> Icom_IC-2730A | [Reported working](https://chirp.danplanet.com/issues/10261) | 17-Dec-2022 | Yes | 0.21% |
 | <a name="Icom_IC-2820H"></a> Icom_IC-2820H | [@kk7ds](https://github.com/kk7ds) | 22-Oct-2022 | Yes | 0.04% |
 | <a name="Icom_IC-7000"></a> Icom_IC-7000 |  |  | Yes | 0.03% |
-| <a name="Icom_IC-7100"></a> Icom_IC-7100 |  |  | Yes | 0.06% |
+| <a name="Icom_IC-7100"></a> Icom_IC-7100 | Mike W | 16-Feb-2023 | Yes | 0.06% |
 | <a name="Icom_IC-7200"></a> Icom_IC-7200 | [@kk7ds](https://github.com/kk7ds) | 22-Oct-2022 | Yes |  |
 | <a name="Icom_IC-7300"></a> Icom_IC-7300 | [@kk7ds](https://github.com/kk7ds) | 22-Oct-2022 | Yes | 0.03% |
 | <a name="Icom_IC-746"></a> Icom_IC-746 | [Reported working](https://chirp.danplanet.com/issues/10346) | 3-Feb-2023 | Yes |  |
@@ -98,6 +100,7 @@
 | <a name="Icom_IC-T7H"></a> Icom_IC-T7H | [Probably works](https://github.com/kk7ds/chirp/blob/py3/chirp/drivers/icf.py) | 12-Dec-2022 | Yes | 0.02% |
 | <a name="Icom_IC-T8A"></a> Icom_IC-T8A | [Probably works](https://github.com/kk7ds/chirp/blob/py3/chirp/drivers/icf.py) | 12-Dec-2022 | Yes | 0.01% |
 | <a name="Icom_IC-U82"></a> Icom_IC-U82 | [Implied by Icom_IC-V82](#user-content-Icom_IC-V82) | 25-Jan-2023 | Yes |  |
+| <a name="Icom_IC-V80"></a> Icom_IC-V80 | [@kk7ds](https://github.com/kk7ds) | 16-Feb-2023 | Yes | 0.00% |
 | <a name="Icom_IC-V82"></a> Icom_IC-V82 | [@kk7ds](https://github.com/kk7ds) | 25-Jan-2023 | Yes |  |
 | <a name="Icom_IC-V86"></a> Icom_IC-V86 | [Probably works](https://github.com/kk7ds/chirp/blob/py3/chirp/drivers/icf.py) | 12-Dec-2022 | Yes | 0.04% |
 | <a name="Icom_IC-W32A"></a> Icom_IC-W32A | [Reported working](https://chirp.danplanet.com/issues/10238) | 12-Dec-2022 | Yes | 0.02% |
@@ -220,7 +223,7 @@
 | <a name="QYT_KT8900D"></a> QYT_KT8900D | [Implied by BTECH_UV-25X2](#user-content-BTECH_UV-25X2) | 11-Nov-2022 | Yes | 0.52% |
 | <a name="QYT_KT8900R"></a> QYT_KT8900R | [Implied by BTECH_UV-2501+220](#user-content-BTECH_UV-2501+220) | 11-Nov-2022 | Yes | 0.13% |
 | <a name="QYT_KT980PLUS"></a> QYT_KT980PLUS | [Implied by BTECH_UV-25X2](#user-content-BTECH_UV-25X2) | 11-Nov-2022 | Yes | 0.09% |
-| <a name="Quansheng_TG-UV2+"></a> Quansheng_TG-UV2+ |  |  |  | 0.05% |
+| <a name="Quansheng_TG-UV2+"></a> Quansheng_TG-UV2+ | [Reported working](https://chirp.danplanet.com/issues/10398) | 26-Feb-2023 | Yes | 0.05% |
 | <a name="RT_Systems_CSV"></a> RT_Systems_CSV |  |  |  |  |
 | <a name="Radioddity_DB25-G"></a> Radioddity_DB25-G | [@KC9HI](https://github.com/KC9HI) | 11-Nov-2022 | Yes | 0.17% |
 | <a name="Radioddity_GA-2S"></a> Radioddity_GA-2S | [@KC9HI](https://github.com/KC9HI) | 4-Dec-2022 | Yes | 0.19% |
@@ -247,6 +250,7 @@
 | <a name="Retevis_RB27"></a> Retevis_RB27 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.09% |
 | <a name="Retevis_RB27B"></a> Retevis_RB27B | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.02% |
 | <a name="Retevis_RB27V"></a> Retevis_RB27V | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.01% |
+| <a name="Retevis_RB28"></a> Retevis_RB28 | [@KC9HI](https://github.com/KC9HI) | 9-Feb-2023 | Yes | 0.00% |
 | <a name="Retevis_RB28B"></a> Retevis_RB28B | [@KC9HI](https://github.com/KC9HI) | 27-Jan-2023 | Yes |  |
 | <a name="Retevis_RB29"></a> Retevis_RB29 | [@KC9HI](https://github.com/KC9HI) | 24-Dec-2022 | Yes | 0.00% |
 | <a name="Retevis_RB615"></a> Retevis_RB615 | [@KC9HI](https://github.com/KC9HI) | 18-Dec-2022 | Yes | 0.01% |
@@ -254,11 +258,13 @@
 | <a name="Retevis_RB618"></a> Retevis_RB618 | [@KC9HI](https://github.com/KC9HI) | 28-Nov-2022 | Yes | 0.16% |
 | <a name="Retevis_RB619"></a> Retevis_RB619 | [@KC9HI](https://github.com/KC9HI) | 28-Nov-2022 | Yes | 0.01% |
 | <a name="Retevis_RB627B"></a> Retevis_RB627B | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.05% |
+| <a name="Retevis_RB628"></a> Retevis_RB628 | [@KC9HI](https://github.com/KC9HI) | 10-Feb-2023 | Yes |  |
 | <a name="Retevis_RB628B"></a> Retevis_RB628B | [@KC9HI](https://github.com/KC9HI) | 28-Jan-2023 | Yes |  |
 | <a name="Retevis_RB629"></a> Retevis_RB629 | [@KC9HI](https://github.com/KC9HI) | 24-Dec-2022 | Yes | 0.00% |
 | <a name="Retevis_RB75"></a> Retevis_RB75 | [@KC9HI](https://github.com/KC9HI) | 28-Nov-2022 | Yes | 0.02% |
 | <a name="Retevis_RB85"></a> Retevis_RB85 | [@KC9HI](https://github.com/KC9HI) | 28-Nov-2022 | Yes | 0.02% |
 | <a name="Retevis_RT1"></a> Retevis_RT1 | [@KC9HI](https://github.com/KC9HI) | 11-Dec-2022 | Yes | 0.08% |
+| <a name="Retevis_RT15"></a> Retevis_RT15 | [@KC9HI](https://github.com/KC9HI) | 18-Feb-2023 | Yes | 0.00% |
 | <a name="Retevis_RT16"></a> Retevis_RT16 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.02% |
 | <a name="Retevis_RT19"></a> Retevis_RT19 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.00% |
 | <a name="Retevis_RT21"></a> Retevis_RT21 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.20% |
@@ -282,6 +288,7 @@
 | <a name="Retevis_RT76"></a> Retevis_RT76 | [@KC9HI](https://github.com/KC9HI) | 30-Nov-2022 | Yes | 0.02% |
 | <a name="Retevis_RT76P"></a> Retevis_RT76P | [@KC9HI](https://github.com/KC9HI) | 17-Dec-2022 | Yes | 0.04% |
 | <a name="Retevis_RT85"></a> Retevis_RT85 | [@KC9HI](https://github.com/KC9HI) | 5-Dec-2022 | Yes | 0.22% |
+| <a name="Retevis_RT86"></a> Retevis_RT86 | [@KC9HI](https://github.com/KC9HI) | 17-Feb-2023 | Yes |  |
 | <a name="Retevis_RT87"></a> Retevis_RT87 | [@KC9HI](https://github.com/KC9HI) | 17-Dec-2022 | Yes | 0.03% |
 | <a name="Retevis_RT9000D_136-174"></a> Retevis_RT9000D_136-174 | [@KC9HI](https://github.com/KC9HI) | 8-Dec-2022 | Yes | 0.01% |
 | <a name="Retevis_RT9000D_220-260"></a> Retevis_RT9000D_220-260 | [@KC9HI](https://github.com/KC9HI) | 8-Dec-2022 | Yes | 0.01% |
@@ -321,6 +328,7 @@
 | <a name="Wouxun_KG-816"></a> Wouxun_KG-816 | [Implied by Wouxun_KG-UV6](#user-content-Wouxun_KG-UV6) | 11-Dec-2022 | Yes | 0.07% |
 | <a name="Wouxun_KG-818"></a> Wouxun_KG-818 | [Implied by Wouxun_KG-UV6](#user-content-Wouxun_KG-UV6) | 11-Dec-2022 | Yes | 0.04% |
 | <a name="Wouxun_KG-935G"></a> Wouxun_KG-935G | [@mrtjr1](https://github.com/mrtjr1) | 4-Jan-2022 | Yes | 0.05% |
+| <a name="Wouxun_KG-935G_Plus"></a> Wouxun_KG-935G_Plus | [@mrtjr1](https://github.com/mrtjr1) | 7-Feb-2023 | Yes |  |
 | <a name="Wouxun_KG-UV6"></a> Wouxun_KG-UV6 | [@KC9HI](https://github.com/KC9HI) | 11-Dec-2022 | Yes | 0.19% |
 | <a name="Wouxun_KG-UV8D"></a> Wouxun_KG-UV8D | Unit tested; needs confirm | 24-Dec-2022 | Yes | 0.24% |
 | <a name="Wouxun_KG-UV8D_Plus"></a> Wouxun_KG-UV8D_Plus | Unit tested; needs confirm | 2-Jan-2022 | Yes | 0.08% |
@@ -358,7 +366,7 @@
 | <a name="Yaesu_FT-857_897_US"></a> Yaesu_FT-857_897_US | [Implied by Yaesu_FT-817](#user-content-Yaesu_FT-817) | 14-Feb-2019 | Yes | 0.08% |
 | <a name="Yaesu_FT-8800"></a> Yaesu_FT-8800 | [@kk7ds](https://github.com/kk7ds) | 24-Oct-2022 | Yes | 0.08% |
 | <a name="Yaesu_FT-8900"></a> Yaesu_FT-8900 | [Implied by Yaesu_FT-8800](#user-content-Yaesu_FT-8800) | 24-Oct-2022 | Yes | 0.11% |
-| <a name="Yaesu_FT-90"></a> Yaesu_FT-90 |  |  | Yes | 0.02% |
+| <a name="Yaesu_FT-90"></a> Yaesu_FT-90 | [Reported working](https://chirp.danplanet.com/issues/10386) | 22-Feb-2023 | Yes | 0.02% |
 | <a name="Yaesu_FT2D_R"></a> Yaesu_FT2D_R | [Implied by Yaesu_FT3D_R](#user-content-Yaesu_FT3D_R) | 30-Dec-2022 | Yes | 0.02% |
 | <a name="Yaesu_FT2D_Rv2"></a> Yaesu_FT2D_Rv2 | [Implied by Yaesu_FT3D_R](#user-content-Yaesu_FT3D_R) | 30-Dec-2022 | Yes |  |
 | <a name="Yaesu_FT3D_R"></a> Yaesu_FT3D_R | [@kk7ds](https://github.com/kk7ds) | 30-Dec-2022 | Yes | 0.03% |
@@ -378,11 +386,11 @@
 | <a name="Zastone_ZT-X6"></a> Zastone_ZT-X6 | [Implied by Retevis_RT22](#user-content-Retevis_RT22) | 9-Dec-2022 | Yes | 0.11% |
 ## Stats
 
-**Drivers:** 375
+**Drivers:** 383
 
-**Tested:** 82% (310/65) (92% of usage stats)
+**Tested:** 84% (322/61) (93% of usage stats)
 
-**Byte clean:** 88% (332/43)
+**Byte clean:** 89% (341/42)
 
 ## Meaning of this testing
 

@@ -47,7 +47,7 @@ ACK_CMD = 0x06
 MODES = ["FM", "NFM"]
 SKIP_VALUES = ["S", ""]
 TONES = chirp_common.TONES
-DTCS = sorted(chirp_common.DTCS_CODES + [645])
+DTCS = tuple(sorted(chirp_common.DTCS_CODES + (645,)))
 
 # lists related to "extra" settings
 PTTID_LIST = ["OFF", "BOT", "EOT", "BOTH"]
@@ -755,32 +755,6 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
 
         return rf
 
-    def validate_memory(self, mem):
-        msgs = chirp_common.CloneModeRadio.validate_memory(self, mem)
-
-        _mem = self._memobj.memory[mem.number]
-        _msg_duplex = 'Duplex must be "off" for this frequency'
-        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
-
-        if self.MODEL == "GMRS-20V2":
-            if mem.freq not in GMRS_FREQS:
-                if mem.duplex != "off":
-                    msgs.append(chirp_common.ValidationWarning(_msg_duplex))
-            elif mem.duplex and mem.offset != 5000000:
-                msgs.append(chirp_common.ValidationWarning(_msg_offset))
-        if self.MODEL == "GMRS-50X1":
-            if not (mem.number >= 1 and mem.number <= 30):
-                if mem.duplex != "off":
-                    msgs.append(chirp_common.ValidationWarning(_msg_duplex))
-        if self.MODEL == "DB25-G":
-            if mem.freq in GMRS_FREQS3:
-                if mem.duplex and mem.offset != 5000000:
-                    msgs.append(chirp_common.ValidationWarning(_msg_offset))
-                if mem.duplex and mem.duplex != "+":
-                    msgs.append(chirp_common.ValidationWarning(_msg_offset))
-
-        return msgs
-
     def sync_in(self):
         """Download from radio"""
         data = _download(self)
@@ -972,7 +946,7 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
                     mem.duplex = 'off'
                     mem.offset = 0
                     immutable = ["duplex", "offset"]
-            elif self.MODEL == "GMRS-20V2":
+            elif self.MODEL in ["GMRS-20V2", "GMRS-50V2"]:
                 if mem.freq in GMRS_FREQS:
                     if mem.freq in GMRS_FREQS1:
                         # Non-repeater GMRS channels (limit duplex)
@@ -988,9 +962,10 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
                     elif mem.freq in GMRS_FREQS3:
                         # GMRS repeater channels, always either simplex or
                         # +5MHz
-                        if mem.duplex == '':
+                        if mem.duplex != '+':
+                            mem.duplex = ''
                             mem.offset = 0
-                        if mem.duplex == '+':
+                        else:
                             mem.offset = 5000000
                 else:
                     # Not a GMRS channel, so restrict duplex since it will be
@@ -1013,13 +988,11 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
                     elif mem.freq in GMRS_FREQS3:
                         # GMRS repeater channels, always either simplex or
                         # +5MHz
-                        if mem.duplex == '':
-                            mem.offset = 0
-                        elif mem.duplex == '+':
-                            mem.offset = 5000000
-                        else:
+                        if mem.duplex != '+':
                             mem.duplex = ''
                             mem.offset = 0
+                        else:
+                            mem.offset = 5000000
 
         mem.immutable = immutable
 
@@ -1320,6 +1293,12 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
                                        RadioSettingValueList(
                                            LIST_VOX,
                                            LIST_VOX[_mem.settings.langua]))
+                    basic.append(vox)
+                elif self.MODEL == "GMRS-50V2":
+                    vox = RadioSetting("settings.vox", "VOX",
+                                       RadioSettingValueList(
+                                           LIST_VOX,
+                                           LIST_VOX[_mem.settings.vox]))
                     basic.append(vox)
                 else:
                     langua = RadioSetting("settings.langua", "Language",
@@ -1775,14 +1754,14 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
         if self.MODEL == "KT-8R" or self.MODEL == "UV-25X2" \
                 or self.MODEL == "UV-25X4" or self.MODEL == "UV-50X2" \
                 or self.MODEL == "GMRS-50X1" or self.MODEL == "GMRS-20V2" \
-                or self.MODEL == "UV-50X2_G2":
+                or self.MODEL == "UV-50X2_G2" or self.MODEL == "GMRS-50V2":
             tmrtx = RadioSetting("settings.tmrtx", "TX in multi-standby",
                                  RadioSettingValueList(
                                      LIST_TMRTX,
                                      LIST_TMRTX[_mem.settings.tmrtx]))
             basic.append(tmrtx)
 
-        if self.MODEL == "UV-50X2_G2":
+        if self.MODEL == "UV-50X2_G2" or self.MODEL == "GMRS-50V2":
             earpho = RadioSetting("settings.earpho", "Earphone",
                                   RadioSettingValueList(
                                       LIST_EARPH,
@@ -2082,6 +2061,9 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
                 obj.freq[i] = value % 10
                 value /= 10
 
+        _vhf_upper = (convert_bytes_to_limit(_ranges.vhf_high))
+        _uhf_lower = (convert_bytes_to_limit(_ranges.uhf_low))
+
         val1a = RadioSettingValueString(0, 10, convert_bytes_to_freq(
                                         _mem.vfo.a.freq))
         val1a.set_validate_callback(my_validate)
@@ -2089,8 +2071,11 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
         vfoafreq.set_apply_callback(apply_freq, _mem.vfo.a)
         work.append(vfoafreq)
 
-        val1b = RadioSettingValueString(0, 10, convert_bytes_to_freq(
-                                        _mem.vfo.b.freq))
+        val = convert_bytes_to_freq(_mem.vfo.b.freq)
+        if self.MODEL in ["GMRS-50V2", "GMRS-50X1"]:
+            if val[:3] > _vhf_upper and val[:3] < _uhf_lower:
+                val = "462.562500"
+        val1b = RadioSettingValueString(0, 10, val)
         val1b.set_validate_callback(my_validate)
         vfobfreq = RadioSetting("vfo.b.freq", "VFO B frequency", val1b)
         vfobfreq.set_apply_callback(apply_freq, _mem.vfo.b)
@@ -2105,8 +2090,11 @@ class BTechMobileCommon(chirp_common.CloneModeRadio,
             work.append(vfocfreq)
 
             if not self.COLOR_LCD4:
-                val1d = RadioSettingValueString(0, 10, convert_bytes_to_freq(
-                                                _mem.vfo.d.freq))
+                val = convert_bytes_to_freq(_mem.vfo.d.freq)
+                if self.MODEL in ["GMRS-50V2", "GMRS-50X1"]:
+                    if val[:3] > _vhf_upper and val[:3] < _uhf_lower:
+                        val = "462.562500"
+                val1d = RadioSettingValueString(0, 10, val)
                 val1d.set_validate_callback(my_validate)
                 vfodfreq = RadioSetting("vfo.d.freq", "VFO D frequency", val1d)
                 vfodfreq.set_apply_callback(apply_freq, _mem.vfo.d)
@@ -4279,6 +4267,20 @@ class DB25G(BTechColor):
                      chirp_common.PowerLevel("Mid", watts=15),
                      chirp_common.PowerLevel("Low", watts=5)]
 
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if mem.freq in GMRS_FREQS3:
+            if mem.duplex and mem.offset != 5000000:
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+            if mem.duplex and mem.duplex != "+":
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+
+        return msgs
+
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []
         super().check_set_memory_immutable_policy(existing, new)
@@ -4473,7 +4475,7 @@ struct {
   u8 emctp;
   u8 emcch;
   u8 sigbp;
-  u8 unknown8;
+  u8 vox;
   u8 camdf;
   u8 cbmdf;
   u8 ccmdf;
@@ -4508,6 +4510,8 @@ struct {
   u8 skiptx;
   u8 scmode;
   u8 tmrtx;
+  u8 unknown10;
+  u8 earpho;
 } settings;
 
 #seekto 0x3280;
@@ -4646,10 +4650,63 @@ class GMRS50X1(BTechGMRS):
     _fileid = [GMRS50X1_fp1, GMRS50X1_fp, ]
     _gmrs = True
 
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if not (mem.number >= 1 and mem.number <= 30):
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+
+        return msgs
+
     def check_set_memory_immutable_policy(self, existing, new):
         if not (new.number >= 1 and new.number <= 30):
             existing.immutable = []
         super().check_set_memory_immutable_policy(existing, new)
+
+
+@directory.register
+class GMRS50V2(BTechGMRS):
+    """Baofeng Tech GMRS50V2"""
+    MODEL = "GMRS-50V2"
+    BANDS = 2
+    LIST_TMR = LIST_TMR16
+    _power_levels = [chirp_common.PowerLevel("High", watts=50),
+                     chirp_common.PowerLevel("Mid", watts=10),
+                     chirp_common.PowerLevel("Low", watts=5)]
+    _vhf_range = (136000000, 175000000)
+    _uhf_range = (400000000, 521000000)
+    _upper = 255
+    _magic = MSTRING_GMRS50X1
+    _fileid = [GMRS50X1_fp1, GMRS50X1_fp, ]
+    _gmrs = True
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if mem.freq not in GMRS_FREQS:
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+        elif mem.duplex:
+            if mem.duplex and mem.offset != 5000000:
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+
+        return msgs
+
+    def check_set_memory_immutable_policy(self, existing, new):
+        existing.immutable = []
+        super().check_set_memory_immutable_policy(existing, new)
+
+    @classmethod
+    def match_model(cls, filedata, filename):
+        # This model is only ever matched via metadata
+        return False
 
 
 COLORHT_MEM_FORMAT = """
@@ -5716,6 +5773,21 @@ class GMRS20V2(BTechColorWP):
     _magic = MSTRING_GMRS20V2
     _fileid = [GMRS20V2_fp2, GMRS20V2_fp1, GMRS20V2_fp, ]
     _gmrs = True
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if mem.freq not in GMRS_FREQS:
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+        elif mem.duplex:
+            if mem.duplex and mem.offset != 5000000:
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+
+        return msgs
 
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []

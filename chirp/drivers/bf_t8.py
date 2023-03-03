@@ -358,24 +358,6 @@ class BFT8Radio(chirp_common.CloneModeRadio):
 
         return rf
 
-    def validate_memory(self, mem):
-        msgs = chirp_common.CloneModeRadio.validate_memory(self, mem)
-
-        _msg_duplex = 'Duplex must be "off" for this frequency'
-        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
-
-        if self.MODEL == "RB27":
-            if mem.freq not in GMRS_FREQS:
-                if mem.duplex != "off":
-                    msgs.append(chirp_common.ValidationWarning(_msg_duplex))
-            if mem.freq in FRS_FREQS3:
-                if mem.duplex and mem.offset != 5000000:
-                    msgs.append(chirp_common.ValidationWarning(_msg_offset))
-                if mem.duplex and mem.duplex != "+":
-                    msgs.append(chirp_common.ValidationWarning(_msg_offset))
-
-        return msgs
-
     def process_mmap(self):
         self._memobj = bitwise.parse(MEM_FORMAT % self._mem_params, self._mmap)
 
@@ -883,7 +865,7 @@ class RetevisRT16(BFT8Radio):
 class RetevisRB27B(BFT8Radio):
     VENDOR = "Retevis"
     MODEL = "RB27B"
-    DTCS_CODES = sorted(chirp_common.DTCS_CODES + [645])
+    DTCS_CODES = tuple(sorted(chirp_common.DTCS_CODES + (645,)))
     HAS_NAMES = True
     NAME_LENGTH = 6
     VALID_CHARS = chirp_common.CHARSET_UPPER_NUMERIC + "-"
@@ -918,6 +900,23 @@ class RetevisRB27(RetevisRB27B):
     _upper = 99
     _gmrs = True
     _frs = _murs = _pmr = False
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if mem.freq not in GMRS_FREQS:
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+        if mem.freq in FRS_FREQS3:
+            if mem.duplex and mem.offset != 5000000:
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+            if mem.duplex and mem.duplex != "+":
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+
+        return msgs
 
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []
@@ -956,7 +955,7 @@ class FRSA1Radio(BFT8Radio):
     HAS_NAMES = True
     NAME_LENGTH = 6
     SKIP_VALUES = ["", "S"]
-    DTCS_CODES = sorted(chirp_common.DTCS_CODES + [645])
+    DTCS_CODES = tuple(sorted(chirp_common.DTCS_CODES + (645,)))
     DUPLEXES = ['', '-', '+', 'off']
 
     _fingerprint = b"BF-T8A" + b"\x2E"

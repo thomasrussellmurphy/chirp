@@ -711,7 +711,7 @@ UV5R_POWER_LEVELS3 = [chirp_common.PowerLevel("High", watts=8.00),
                       chirp_common.PowerLevel("Med",  watts=4.00),
                       chirp_common.PowerLevel("Low",  watts=1.00)]
 
-UV5R_DTCS = sorted(chirp_common.DTCS_CODES + [645])
+UV5R_DTCS = tuple(sorted(chirp_common.DTCS_CODES + (645,)))
 
 UV5R_CHARSET = chirp_common.CHARSET_UPPER_NUMERIC + \
     "!@#$%^&*()+-=[]:\";'<>?,./"
@@ -750,6 +750,7 @@ class BaofengUV5R(chirp_common.CloneModeRadio):
     _aux_block = True
     _tri_power = False
     _gmrs = False
+    _bw_shift = False
     _mem_params = (0x1828  # poweron_msg offset
                    )
     # offset of fw version in image file
@@ -855,24 +856,6 @@ class BaofengUV5R(chirp_common.CloneModeRadio):
             raise
         except Exception as e:
             raise errors.RadioError("Failed to communicate with radio: %s" % e)
-
-    def validate_memory(self, mem):
-        msgs = super().validate_memory(mem)
-
-        _msg_duplex = 'Duplex must be "off" for this frequency'
-        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
-
-        if self._gmrs:
-            if not (mem.number >= 1 and mem.number <= 30):
-                if mem.duplex != "off":
-                    msgs.append(chirp_common.ValidationWarning(_msg_duplex))
-        if self.MODEL == "GT-5R":
-            if not ((mem.freq >= self.vhftx[0] and mem.freq < self.vhftx[1]) or
-                    (mem.freq >= self.uhftx[0] and mem.freq < self.uhftx[1])):
-                if mem.duplex != "off":
-                    msgs.append(chirp_common.ValidationWarning(_msg_duplex))
-
-        return msgs
 
     def get_raw_memory(self, number):
         return repr(self._memobj.memory[number])
@@ -1660,15 +1643,26 @@ class BaofengUV5R(chirp_common.CloneModeRadio):
         fm_preset = RadioSettingGroup("fm_preset", "FM Radio Preset")
         group.append(fm_preset)
 
-        if _fm_presets <= 108.0 * 10 - 650:
-            preset = _fm_presets / 10.0 + 65
-        elif _fm_presets >= 65.0 * 10 and _fm_presets <= 108.0 * 10:
-            preset = _fm_presets / 10.0
+        # broadcast FM settings
+        value = self._memobj.fm_presets
+        value_shifted = ((value & 0x00FF) << 8) | ((value & 0xFF00) >> 8)
+        if value_shifted >= 65.0 * 10 and value_shifted <= 108.0 * 10:
+            # storage method 3 (discovered 2022)
+            self._bw_shift = True
+            preset = value_shifted / 10.0
+        elif value >= 65.0 * 10 and value <= 108.0 * 10:
+            # storage method 2
+            preset = value / 10.0
+        elif value <= 108.0 * 10 - 650:
+            # original storage method (2012)
+            preset = value / 10.0 + 65
         else:
-            preset = 76.0
-        rs = RadioSetting("fm_presets", "FM Preset(MHz)",
-                          RadioSettingValueFloat(65, 108.0, preset, 0.1, 1))
-        fm_preset.append(rs)
+            # unknown (undiscovered method or no FM chip?)
+            preset = False
+        if preset:
+            rs = RadioSettingValueFloat(65, 108.0, preset, 0.1, 1)
+            rset = RadioSetting("fm_presets", "FM Preset(MHz)", rs)
+            fm_preset.append(rset)
 
         dtmf = RadioSettingGroup("dtmf", "DTMF Settings")
         group.append(dtmf)
@@ -1839,6 +1833,8 @@ class BaofengUV5R(chirp_common.CloneModeRadio):
                 else:
                     value = int(val.get_value() * 10)
                 LOG.debug("Setting fm_presets = %s" % (value))
+                if self._bw_shift:
+                    value = ((value & 0x00FF) << 8) | ((value & 0xFF00) >> 8)
                 self._memobj.fm_presets = value
             except Exception as e:
                 LOG.debug(element.get_name())
@@ -2092,6 +2088,19 @@ class RadioddityGT5RRadio(BaofengUV5R):
     vhftx = [144000000, 148000000]
     uhftx = [420000000, 450000000]
 
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if not ((mem.freq >= self.vhftx[0] and mem.freq < self.vhftx[1]) or
+                (mem.freq >= self.uhftx[0] and mem.freq < self.uhftx[1])):
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+
+        return msgs
+
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []
         super().check_set_memory_immutable_policy(existing, new)
@@ -2109,6 +2118,18 @@ class RadioddityUV5GRadio(BaofengUV5R):
     _basetype = BASETYPE_UV5R
     _idents = [UV5R_MODEL_UV5G]
     _gmrs = True
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if not (mem.number >= 1 and mem.number <= 30):
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+
+        return msgs
 
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []

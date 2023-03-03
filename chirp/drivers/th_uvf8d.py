@@ -133,7 +133,7 @@ struct memory {
   u8 bclo:2,
      wideband:1,
      ishighpower:1,
-     unknown21:1,
+     scanadd:1,
      vox:1,
      pttid:2;
   u8 unknown3:8;
@@ -187,7 +187,7 @@ struct {
      roger:1;
   u8 light:2,
      led:2,
-     unknown206a:1,
+     taileliminate:1,
      autolk:1,
      unknown206ax:2;
   u8 unknown206b:1,
@@ -472,6 +472,7 @@ class TYTUVF8DRadio(chirp_common.CloneModeRadio):
 
         flag_index = 7 - ((mem.number - 1) % 8)
         s.flags[flag_index] = (mem.skip == "")
+        _mem.scanadd = (mem.skip == "")
         _mem.wideband = mem.mode == "FM"
         _mem.ishighpower = mem.power == POWER_LEVELS[0]
 
@@ -573,6 +574,10 @@ class TYTUVF8DRadio(chirp_common.CloneModeRadio):
                 "scan_mode", "Scan Mode",
                 RadioSettingValueList(
                     SCAN_MODE_LIST, SCAN_MODE_LIST[_settings.scan_mode])))
+
+        group.append(RadioSetting(
+            'taileliminate', 'Tail Eliminate',
+            RadioSettingValueBoolean(_settings.taileliminate)))
 
         group.append(RadioSetting(
                 "autolk", "Auto Lock",

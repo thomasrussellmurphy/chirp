@@ -70,7 +70,6 @@ class ChirpRowLabelRenderer(glr.GridDefaultRowLabelRenderer):
 
 
 class ChirpMemoryColumn(object):
-    NAME = None
     DEFAULT = ''
 
     def __init__(self, name, radio, label=None):
@@ -79,7 +78,7 @@ class ChirpMemoryColumn(object):
         :param label: Static label override
         """
         self._name = name
-        self._label = label
+        self._label = label or _(name.title())
         self._radio = radio
         self._features = radio.get_features()
 
@@ -89,9 +88,7 @@ class ChirpMemoryColumn(object):
 
     @property
     def label(self):
-        return (self.NAME or
-                self._label or
-                self._name.title().replace('_', '\n'))
+        return self._label.replace('_', ' ').replace(' ', '\n', 1)
 
     def hidden_for(self, memory):
         return False
@@ -271,6 +268,9 @@ class ChirpChoiceEditor(wx.grid.GridCellChoiceEditor):
 
 
 class ChirpChoiceColumn(ChirpMemoryColumn):
+    # This is just here so it is marked for translation
+    __TITLE1 = _('Tuning Step')
+
     def __init__(self, name, radio, choices, **k):
         super(ChirpChoiceColumn, self).__init__(name, radio, **k)
         self._choices = choices
@@ -310,8 +310,9 @@ class ChirpChoiceColumn(ChirpMemoryColumn):
 
 class ChirpToneColumn(ChirpChoiceColumn):
     def __init__(self, name, radio):
-        tones = [str(x) for x in chirp_common.TONES]
         self.rf = radio.get_features()
+        tones = self.rf.valid_tones or chirp_common.TONES
+        tones = [str(x) for x in tones]
         super(ChirpToneColumn, self).__init__(name, radio,
                                               tones)
 
@@ -320,7 +321,7 @@ class ChirpToneColumn(ChirpChoiceColumn):
         if self._name == 'rtone':
             return _('Tone')
         else:
-            return _('Tone Squelch').replace(' ', '\n')
+            return _('Tone Squelch').replace(' ', '\n', 1)
 
     def rtone_visible(self, memory):
         if not self._features.has_ctone:
@@ -351,6 +352,9 @@ class ChirpToneColumn(ChirpChoiceColumn):
 
 
 class ChirpDuplexColumn(ChirpChoiceColumn):
+    # This is just here so it is marked for translation
+    __TITLE = _('Duplex')
+
     def __init__(self, *a, **k):
         super().__init__(*a, **k)
         self._wants_split = set()
@@ -380,7 +384,9 @@ class ChirpDuplexColumn(ChirpChoiceColumn):
 
 class ChirpDTCSColumn(ChirpChoiceColumn):
     def __init__(self, name, radio):
-        dtcs_codes = ['%03i' % code for code in chirp_common.DTCS_CODES]
+        rf = radio.get_features()
+        codes = rf.valid_dtcs_codes or chirp_common.DTCS_CODES
+        dtcs_codes = ['%03i' % code for code in codes]
         super(ChirpDTCSColumn, self).__init__(name, radio,
                                               dtcs_codes)
 
@@ -441,6 +447,9 @@ class ChirpDTCSPolColumn(ChirpChoiceColumn):
 
 
 class ChirpCrossModeColumn(ChirpChoiceColumn):
+    # This is just here so it is marked for translation
+    __TITLE = _('Mode')
+
     def __init__(self, name, radio):
         rf = radio.get_features()
         super(ChirpCrossModeColumn, self).__init__(name, radio,
@@ -460,6 +469,9 @@ class ChirpCrossModeColumn(ChirpChoiceColumn):
 
 
 class ChirpCommentColumn(ChirpMemoryColumn):
+    # This is just here so it is marked for translation
+    __TITLE = _('Comment')
+
     @property
     def valid(self):
         return (self._features.has_comment or
@@ -565,7 +577,7 @@ class ChirpMemEdit(common.ChirpEditor, common.ChirpSyncEditor):
             ChirpMemoryColumn('name', self._radio),
             ChirpChoiceColumn('tmode', self._radio,
                               valid_tmodes,
-                              label=_('Tone Mode').replace(' ', '\n')),
+                              label=_('Tone Mode')),
             ChirpToneColumn('rtone', self._radio),
             ChirpToneColumn('ctone', self._radio),
             ChirpDTCSColumn('dtcs', self._radio),

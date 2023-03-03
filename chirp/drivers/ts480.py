@@ -106,9 +106,6 @@ TS480_SKIP = ["", "S"]
 # start at 0:LSB
 TS480_MODES = ["LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"]
 EX_MODES = ["FSK-R", "CW-R"]
-for ix in EX_MODES:
-    if ix not in chirp_common.MODES:
-        chirp_common.MODES.append(ix)
 
 TS480_TONES = list(chirp_common.TONES)
 TS480_TONES.append(1750.0)
@@ -505,7 +502,7 @@ class TS480_CRadio(chirp_common.CloneModeRadio):
         rf.valid_bands = TS480_BANDS
         rf.valid_characters = chirp_common.CHARSET_UPPER_NUMERIC + "*+-/"
         rf.valid_duplexes = TS480_DUPLEX
-        rf.valid_modes = TS480_MODES
+        rf.valid_modes = [x for x in TS480_MODES if x in chirp_common.MODES]
         rf.valid_skips = TS480_SKIP
         rf.valid_tuning_steps = TS480_TUNE_STEPS
         rf.valid_tmodes = ["", "Tone", "TSQL"]
@@ -675,8 +672,22 @@ class TS480_CRadio(chirp_common.CloneModeRadio):
         options = [0.5, 1.0, 2.5, 5.0, 10.0]    # SSB/CS/FSK steps
         if _mem.xmode == 4 or _mem.xmode == 5:   # AM/FM
             options = TS480_TUNE_STEPS[3:]
-        _mem.step = options.index(mem.tuning_step)
+        try:
+            _mem.step = options.index(mem.tuning_step)
+        except ValueError:
+            _mem.step = options[0]
         return
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+        if mem.mode in ('AM', 'FM'):
+            if mem.tuning_step not in TS480_TUNE_STEPS[3:]:
+                msgs.append(chirp_common.ValidationError(
+                    'Tuning step %s must be in list %s for %s' % (
+                        mem.tuning_step,
+                        ','.join(str(x) for x in TS480_TUNE_STEPS[3:]),
+                        mem.mode)))
+        return msgs
 
     def _parse_mem_spec(self, spec0, spec1):
         """ Extract ascii memory parameters; build data string """

@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 
-import mock
+from unittest import mock
 
 from tests.unit import base
 from chirp import CHIRP_VERSION
@@ -718,8 +718,10 @@ class TestOverrideRules(base.BaseTest):
         'Baofeng_GT-5R',
         'Baofeng_UV-9G',
         'BTECH_GMRS-20V2',
+        'BTECH_GMRS-50V2',
         'BTECH_GMRS-50X1',
         'BTECH_GMRS-V2',
+        'BTECH_MURS-V2',
         'Radioddity_DB25-G',
         'Radioddity_UV-5G',
         'Retevis_RA85',

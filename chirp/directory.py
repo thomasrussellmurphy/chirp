@@ -154,13 +154,15 @@ def get_radio_by_image(image_file):
 
         meta_vendor = metadata.get('vendor')
         meta_model = metadata.get('model')
+        meta_variant = metadata.get('variant')
 
         meta_vendor, meta_model = MODEL_COMPAT.get((meta_vendor, meta_model),
                                                    (meta_vendor, meta_model))
 
         # If metadata, then it has to match one of the aliases or the parent
         for alias in rclass.ALIASES + [rclass]:
-            if (alias.VENDOR == meta_vendor and alias.MODEL == meta_model):
+            if (alias.VENDOR == meta_vendor and alias.MODEL == meta_model and
+                    (meta_variant is None or alias.VARIANT == meta_variant)):
 
                 class DynamicRadioAlias(rclass):
                     _orig_rclass = rclass
@@ -180,8 +182,9 @@ def get_radio_by_image(image_file):
 
 
 def import_drivers(limit=None):
-    if sys.platform == 'win32':
-        # Assume we are in a frozen win32 build, so we can not glob
+    frozen = getattr(sys, 'frozen', False)
+    if sys.platform == 'win32' and frozen:
+        # We are in a frozen win32 build, so we can not glob
         # the driver files, but we do not need to anyway
         import chirp.drivers
         for module in chirp.drivers.__all__:

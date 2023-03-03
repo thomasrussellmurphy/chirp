@@ -22,6 +22,7 @@ import re
 from chirp.drivers import baofeng_common
 from chirp import chirp_common, directory, memmap
 from chirp import bitwise, errors, util
+from chirp import bandplan_na
 from chirp.settings import RadioSettingGroup, RadioSetting, \
     RadioSettingValueBoolean, RadioSettingValueList, \
     RadioSettingValueString, RadioSettingValueInteger, \
@@ -67,6 +68,9 @@ LIST_TXPOWER = ["High", "Mid", "Low"]
 LIST_VOICE = ["Off", "English", "Chinese"]
 LIST_WORKMODE = ["Frequency", "Channel"]
 
+TXP_CHOICES = ["High", "Low"]
+TXP_VALUES = [0x00, 0x02]
+
 
 def model_match(cls, data):
     """Match the opened/downloaded image to the correct version"""
@@ -109,7 +113,7 @@ class WP970I(baofeng_common.BaofengCommonHT):
         "!@#$%^&*()+-=[]:\";'<>?,./"
     LENGTH_NAME = 6
     SKIP_VALUES = ["", "S"]
-    DTCS_CODES = sorted(chirp_common.DTCS_CODES + [645])
+    DTCS_CODES = tuple(sorted(chirp_common.DTCS_CODES + (645,)))
     POWER_LEVELS = [chirp_common.PowerLevel("High", watts=5.00),
                     chirp_common.PowerLevel("Med",  watts=3.00),
                     chirp_common.PowerLevel("Low",  watts=1.00)]
@@ -724,17 +728,48 @@ class WP970I(baofeng_common.BaofengCommonHT):
         rs.set_apply_callback(apply_offset, _mem.vfo.b)
         work.append(rs)
 
-        rs = RadioSetting("vfo.a.txpower3", "VFO A Power",
-                          RadioSettingValueList(
-                              LIST_TXPOWER,
-                              LIST_TXPOWER[_mem.vfo.a.txpower3]))
-        work.append(rs)
+        def apply_txpower_listvalue(setting, obj):
+            LOG.debug("Setting value: " + str(
+                      setting.value) + " from list")
+            val = str(setting.value)
+            index = TXP_CHOICES.index(val)
+            val = TXP_VALUES[index]
+            obj.set_value(val)
 
-        rs = RadioSetting("vfo.b.txpower3", "VFO B Power",
-                          RadioSettingValueList(
-                              LIST_TXPOWER,
-                              LIST_TXPOWER[_mem.vfo.b.txpower3]))
-        work.append(rs)
+        if self._tri_band:
+            if _mem.vfo.a.txpower3 in TXP_VALUES:
+                idx = TXP_VALUES.index(_mem.vfo.a.txpower3)
+            else:
+                idx = TXP_VALUES.index(0x00)
+            rs = RadioSettingValueList(TXP_CHOICES, TXP_CHOICES[idx])
+            rset = RadioSetting("vfo.a.txpower3", "VFO A Power", rs)
+            rset.set_apply_callback(apply_txpower_listvalue,
+                                    _mem.vfo.a.txpower3)
+            work.append(rset)
+
+            if _mem.vfo.b.txpower3 in TXP_VALUES:
+                idx = TXP_VALUES.index(_mem.vfo.b.txpower3)
+            else:
+                idx = TXP_VALUES.index(0x00)
+            rs = RadioSettingValueList(TXP_CHOICES, TXP_CHOICES[idx])
+            rset = RadioSetting("vfo.b.txpower3", "VFO B Power", rs)
+            rset.set_apply_callback(apply_txpower_listvalue,
+                                    _mem.vfo.b.txpower3)
+            work.append(rset)
+        else:
+            rs = RadioSetting("vfo.a.txpower3", "VFO A Power",
+                              RadioSettingValueList(
+                                  LIST_TXPOWER,
+                                  LIST_TXPOWER[min(_mem.vfo.a.txpower3, 0x02)]
+                                               ))
+            work.append(rs)
+
+            rs = RadioSetting("vfo.b.txpower3", "VFO B Power",
+                              RadioSettingValueList(
+                                  LIST_TXPOWER,
+                                  LIST_TXPOWER[min(_mem.vfo.b.txpower3, 0x02)]
+                                               ))
+            work.append(rs)
 
         rs = RadioSetting("vfo.a.widenarr", "VFO A Bandwidth",
                           RadioSettingValueList(
@@ -784,7 +819,7 @@ class WP970I(baofeng_common.BaofengCommonHT):
             preset = value / 10.0 + 65
         else:
             # unknown (undiscovered method or no FM chip?)
-            preset = nul
+            preset = False
         if preset:
             rs = RadioSettingValueFloat(65, 108.0, preset, 0.1, 1)
             rset = RadioSetting("fm_presets", "FM Preset(MHz)", rs)
@@ -898,6 +933,7 @@ class BFA58(WP970I):
     """Baofeng BF-A58"""
     VENDOR = "Baofeng"
     MODEL = "BF-A58"
+    LENGTH_NAME = 7
     ALIASES = [RH5XAlias, UV9RPROAlias]
 
     _fileid = ["BFT515 ", "BFT517 "]
@@ -930,6 +966,8 @@ class BFA58S(WP970I):
     VENDOR = "Baofeng"
     MODEL = "BF-A58S"
     LENGTH_NAME = 7
+    POWER_LEVELS = [chirp_common.PowerLevel("High", watts=5.00),
+                    chirp_common.PowerLevel("Low", watts=1.00)]
     ALIASES = [UV82IIIAlias]
     _tri_band = True
 
@@ -961,6 +999,21 @@ class UV9G(WP970I):
                     chirp_common.PowerLevel("Low",  watts=0.50)]
     _magic = [MSTRING_UV9G, ]
     _gmrs = True
+
+    def validate_memory(self, mem):
+        msgs = super().validate_memory(mem)
+
+        _msg_duplex = 'Duplex must be "off" for this frequency'
+        _msg_offset = 'Only simplex or +5MHz offset allowed on GMRS'
+
+        if mem.freq not in bandplan_na.ALL_GMRS_FREQS:
+            if mem.duplex != "off":
+                msgs.append(chirp_common.ValidationWarning(_msg_duplex))
+        if mem.freq in bandplan_na.GMRS_HIRPT:
+            if mem.duplex and mem.offset != 5000000:
+                msgs.append(chirp_common.ValidationWarning(_msg_offset))
+
+        return msgs
 
     def check_set_memory_immutable_policy(self, existing, new):
         existing.immutable = []
